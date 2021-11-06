@@ -8,10 +8,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from argparse import ArgumentParser
-from random import seed
-from random import random
-# seed random number generator
-seed(1)
+
 parser = ArgumentParser()
 parser.add_argument("--UseRANSAC", type=int, default=0)
 parser.add_argument("--image1", type=str, default='data/myleft.jpg')
@@ -19,6 +16,34 @@ parser.add_argument("--image2", type=str, default='data/myright.jpg')
 args = parser.parse_args()
 
 print(args)
+
+
+def get_svd(matrix):
+    rank, _ = matrix.shape
+    a_t_a = matrix.T@matrix
+
+    v_eigval, v_eigvec = np.linalg.eigh(a_t_a)
+    v_eigvec = np.flip(v_eigvec.T, axis=0)
+
+    v_eigval[::-1].sort()
+    v_eigval = np.sqrt(v_eigval)
+
+    u_eigvec = np.zeros((matrix.shape[0], matrix.shape[0]))
+
+    for col in range(rank):
+        u_eigvec[:, col] = (1 / v_eigval[col]) * (matrix @ v_eigvec[col].T)
+
+    return u_eigvec, v_eigval, v_eigvec
+
+
+def my_svd(matrix):
+    m, n = matrix.shape
+
+    if m <= n:
+        return get_svd(matrix)
+    else:
+        v_eigvec, v_eigval, u_eigvec = get_svd(matrix.T)
+        return u_eigvec.T, v_eigval, v_eigvec.T
 
 
 def normalize_data(x):
@@ -31,80 +56,46 @@ def normalize_data(x):
         dist.append(cur_dist)
 
     mdist = np.mean(dist)
-    mdist = np.std(x)
+
     tr_m = [[np.sqrt(2) / mdist, 0, -mvec[0] * (np.sqrt(2) / mdist)],
             [0, np.sqrt(2) / mdist, -mvec[1] * (np.sqrt(2) / mdist)],
             [0, 0, 1]]
+
     tr_m = np.array(tr_m)
-    
+
     ones = np.ones((len(x), 1))
     aug_x = np.hstack((x, ones))
 
     x = aug_x@tr_m.T
 
-    return x, tr_m
-
-def normalize(points):
-    mean_x = np.mean(points[:,0])
-    mean_y = np.mean(points[:,1])
-    
-    std = np.mean(np.sqrt((points[:,0] - mean_x)**2 + (points[:,1] - mean_y)**2))
-    
-    scale = np.sqrt(2)/std
-    
-    translate_x = -scale*mean_x
-    translate_y = -scale*mean_y
-    
-    T = [[scale,   0,     translate_x],
-         [0,       scale, translate_y],
-         [0,       0,     1]]
-    
-    return np.array(T)
+    return x.T, tr_m
 
 
 def FM_by_normalized_8_point(pts1, pts2):
-    F, _ = cv2.findFundamentalMat(pts1, pts2, cv2.FM_8POINT)
+    F_prime, _ = cv2.findFundamentalMat(pts1, pts2, cv2.FM_8POINT)
     # comment out the above line of code. 
 
-    no_of_points = len(pts1)
-    # pts1, tr_m_1 = normalize_data(pts1)
-    # pts2, tr_m_2 = normalize_data(pts2)
+    pts1, tr_m_1 = normalize_data(pts1)
+    pts2, tr_m_2 = normalize_data(pts2)
 
-    tr_m_1 = normalize(pts1)
-    tr_m_2 = normalize(pts2)
-    
-    ## add one column become [x y 1] and change the shape to 3*N 
-    p1 = np.hstack((pts1, np.ones((no_of_points, 1)))).T
-    p2 = np.hstack((pts2, np.ones((no_of_points, 1)))).T
-    
-    pts1 = np.dot(tr_m_1, p1).T
-    pts2 = np.dot(tr_m_2, p2).T
-
+    no_of_points = len(pts1[0])
     coeff_matrix = np.zeros((no_of_points, 9))
 
     for pt in range(no_of_points):
-        coeff_matrix[pt, 0] = pts1[pt, 0] * pts2[pt, 0]
-        coeff_matrix[pt, 1] = pts1[pt, 0] * pts2[pt, 1]
-        coeff_matrix[pt, 2] = pts1[pt, 0]
-        coeff_matrix[pt, 3] = pts1[pt, 1] * pts2[pt, 0]
-        coeff_matrix[pt, 4] = pts1[pt, 1] * pts2[pt, 1]
-        coeff_matrix[pt, 5] = pts1[pt, 1]
-        coeff_matrix[pt, 6] = pts2[pt, 0]
-        coeff_matrix[pt, 7] = pts2[pt, 1]
-        coeff_matrix[pt, 8] = 1
-        
-    # a_t_a = coeff_matrix.T @ coeff_matrix
-    _, s, v = np.linalg.svd(coeff_matrix)
+        coeff_matrix[pt] = [pts2[0, pt] * pts1[0, pt], pts2[0, pt] * pts1[1, pt], pts2[0, pt],
+                            pts2[1, pt] * pts1[0, pt], pts2[1, pt] * pts1[1, pt], pts2[1, pt],
+                            pts1[0, pt], pts1[1, pt], 1]
 
-    F_prime = v.T[:, -1].reshape((3, 3), order = 'F')
+    _, _, v = my_svd(coeff_matrix)
 
-    U, S, V = np.linalg.svd(F_prime)
-    S[2] = 0
-    F_prime = np.dot(U, np.dot(np.diag(S), V))
-    # F_prime = F_prime / F_prime[2, 2]
-    F_prime = np.dot(tr_m_2.T, np.dot(F, tr_m_1))
-    F_prime = F_prime / F_prime[2, 2]
-    # F:  fundmental matrix
+    F = v[-1].reshape(3, 3)
+
+    u, s, v = my_svd(F)
+    s[2] = 0
+    F = u @ (np.diag(s) @ v)
+    F = (np.transpose(tr_m_2) @ F) @ tr_m_1
+    F = F / F[2, 2]
+
     return F
 
 
@@ -123,39 +114,30 @@ def FM_by_RANSAC(pts1, pts2):
 img1 = cv2.imread(args.image1, 0)
 img2 = cv2.imread(args.image2, 0)
 
-# sift = cv2.xfeatures2d.SIFT_create()
+sift = cv2.SIFT_create()
 
-# # find the keypoints and descriptors with SIFT
-# kp1, des1 = sift.detectAndCompute(img1, None)
-# kp2, des2 = sift.detectAndCompute(img2, None)
+# find the keypoints and descriptors with SIFT
+kp1, des1 = sift.detectAndCompute(img1, None)
+kp2, des2 = sift.detectAndCompute(img2, None)
 
-# # FLANN parameters
-# FLANN_INDEX_KDTREE = 0
-# index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
-# search_params = dict(checks=50)
+# FLANN parameters
+FLANN_INDEX_KDTREE = 0
+index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+search_params = dict(checks=50)
 
-# flann = cv2.FlannBasedMatcher(index_params, search_params)
-# matches = flann.knnMatch(des1, des2, k=2)
+flann = cv2.FlannBasedMatcher(index_params, search_params)
+matches = flann.knnMatch(des1, des2, k=2)
 
-# good = []
-# pts1 = []
-# pts2 = []
-
-# # ratio test as per Lowe's paper
-# for i, (m, n) in enumerate(matches):
-#     if m.distance < 0.8 * n.distance:
-#         good.append(m)
-#         pts2.append(kp2[m.trainIdx].pt)
-#         pts1.append(kp1[m.queryIdx].pt)
-
+good = []
 pts1 = []
 pts2 = []
 
-h, w = len(img1), len(img1[0])
-
-for i in range(123):
-    pts1.append([random()*h, random()*w])
-    pts2.append([random()*h, random()*w])
+# ratio test as per Lowe's paper
+for i, (m, n) in enumerate(matches):
+    if m.distance < 0.8 * n.distance:
+        good.append(m)
+        pts2.append(kp2[m.trainIdx].pt)
+        pts1.append(kp1[m.queryIdx].pt)
 
 pts1 = np.int32(pts1)
 pts2 = np.int32(pts2)
