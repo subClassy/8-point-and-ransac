@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f7489e45-2ce7-4412-ae13-708e3403b8b4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="f7489e45-2ce7-4412-ae13-708e3403b8b4" name="Changes" comment="Completed 8 point">
       <change afterPath="$PROJECT_DIR$/FM_test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FM.py" beforeDir="false" afterPath="$PROJECT_DIR$/FM.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/4191453057_c86028ce1f_o.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/7433804322_06c5620f13_o.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/9193029855_2c85a50e91_o.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/921919841_a30df938f2_o.jpg" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +24,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="ProjectId" id="20NXpoqRMtfYEgU8FlqWEstt3Yd" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -100,8 +104,17 @@
       <workItem from="1635896288943" duration="652000" />
       <workItem from="1635896956666" duration="5588000" />
       <workItem from="1635957019818" duration="676000" />
-      <workItem from="1636157021077" duration="9730000" />
+      <workItem from="1636157021077" duration="12898000" />
+      <workItem from="1636492481618" duration="4112000" />
     </task>
+    <task id="LOCAL-00001" summary="Completed 8 point">
+      <created>1636169402162</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1636169402162</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -119,28 +132,17 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Completed 8 point" />
+    <option name="LAST_COMMIT_MESSAGE" value="Completed 8 point" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/FM_test.py</url>
-          <line>83</line>
-          <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/FM.py</url>
-          <line>98</line>
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/FM.py</url>
-          <line>93</line>
-          <option name="timeStamp" value="35" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/FM.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="36" />
+          <line>134</line>
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -153,7 +155,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Assignment_2$FM_test.coverage" NAME="FM_test Coverage Results" MODIFIED="1636159894258" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Assignment_2$FM.coverage" NAME="FM Coverage Results" MODIFIED="1636167841281" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Assignment_2$FM_test.coverage" NAME="FM_test Coverage Results" MODIFIED="1636173685822" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Assignment_2$FM.coverage" NAME="FM Coverage Results" MODIFIED="1636496603299" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

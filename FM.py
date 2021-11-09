@@ -8,11 +8,12 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from argparse import ArgumentParser
+import random
 
 parser = ArgumentParser()
-parser.add_argument("--UseRANSAC", type=int, default=0)
-parser.add_argument("--image1", type=str, default='data/myleft.jpg')
-parser.add_argument("--image2", type=str, default='data/myright.jpg')
+parser.add_argument("--UseRANSAC", type=int, default=1)
+parser.add_argument("--image1", type=str, default='data/notre_dame_1.jpg')
+parser.add_argument("--image2", type=str, default='data/notre_dame_2.jpg')
 args = parser.parse_args()
 
 print(args)
@@ -100,15 +101,38 @@ def FM_by_normalized_8_point(pts1, pts2):
 
 
 def FM_by_RANSAC(pts1, pts2):
-    F, mask = cv2.findFundamentalMat(pts1, pts2, cv2.FM_RANSAC)
-    # comment out the above line of code. 
+    F_prime, mask_prime = cv2.findFundamentalMat(pts1, pts2, cv2.FM_RANSAC)
+    # comment out the above line of code.
+    threshold = 1
+    iterations = 10
+    no_of_points = len(pts1)
+    best_mask = np.zeros(no_of_points)
+    best_inliers = 0
+    best_f = np.zeros((3, 3))
+    for _ in range(iterations):
+        sample = random.sample(range(0, no_of_points), 8)
+        sample_pts1 = pts1[sample]
+        sample_pts2 = pts2[sample]
+        sample_f = FM_by_normalized_8_point(sample_pts1, sample_pts2)
+        error_matrix = np.zeros(no_of_points)
 
-    # Your task is to implement the algorithm by yourself.
-    # Do NOT copy&paste any online implementation. 
+        for pts in range(no_of_points):
+            epiline = np.dot(sample_f, np.hstack((pts1[pts], [1])))
 
-    # F:  fundmental matrix
-    # mask:   whetheter the points are inliers
-    return F, mask
+            x = pts2[pts][0]
+            y = pts2[pts][1]
+            d = abs(epiline[0] * x + epiline[1] * y + epiline[2]) / np.sqrt(epiline[0] ** 2 + epiline[1] ** 2)
+            error_matrix[pts] = d
+
+        mask = np.int8(np.absolute(error_matrix) < threshold)
+        maybe_inliers = len(mask.nonzero()[0])
+
+        if maybe_inliers > best_inliers:
+            best_inliers = maybe_inliers
+            best_mask = mask
+            best_f = sample_f
+
+    return best_f, best_mask
 
 
 img1 = cv2.imread(args.image1, 0)
